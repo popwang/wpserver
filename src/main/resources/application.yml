@@ -1,0 +1,7 @@
+spring:
+  profiles:
+    active: dev
+  datasource:
+    driverClassName: com.mysql.jdbc.Driver
+    username: root
+    password: admin3#
