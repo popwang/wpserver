@@ -5,3 +5,16 @@ spring:
     driverClassName: com.mysql.jdbc.Driver
     username: root
     password: admin3#
+  jpa:
+    database: mysql
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate.format_sql: true
+mybatis:
+  mapper-locations: classpath:mapper/*Mapper.xml
+netty:
+  server:
+    port: 9999
+    poolSize: 20

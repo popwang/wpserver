@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ads.wpserver.mysql.mapper.WpOrderBufferMapper" >
+ <select id="selectOrderBufferByName" parameterType="string" resultType="com.ads.wpserver.mysql.model.WpOrderBuffer">
+  		SELECT * FROM t_wp_order_buffer 
+  		WHERE v_equipment_name= #{v_equipment_name} 
+  		AND i_send_flag<![CDATA[  < ]]>3 
+  		AND dtm_create<![CDATA[ > ]]>DATE_FORMAT(NOW(),'%Y-%m-%d') 
+  		ORDER BY dtm_create ASC 
+  		LIMIT 0,1
+  </select>
+  
+  <update id="updateOrderBufferFlag" parameterType="string">
+  		UPDATE t_wp_order_buffer
+  		SET I_SEND_FLAG=I_SEND_FLAG+1
+  		WHERE v_equipment_name= #{v_equipment_name} 
+  </update>
+</mapper>

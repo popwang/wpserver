@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ads.wpserver.mysql.mapper.WpDataMapper" >
+ <insert id="saveWpData" parameterType="com.ads.wpserver.mysql.model.WpData">
+  		insert into t_wp_data
+  		(v_equipment_name,
+  		v_motor_status,
+  		v_motor_temp,
+  		v_motor_speed,
+  		d_longitude,
+  		d_latitude,
+  		i_work_model,
+  		i_work_status)
+  		values
+  		(#{v_equipment_name},
+  		#{v_motor_status},
+  		#{v_motor_temp},
+  		#{v_motor_speed},
+  		#{d_longitude},
+  		#{d_latitude},
+  		#{i_work_model},
+  		#{i_work_status})
+  </insert>
+</mapper>

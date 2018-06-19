@@ -1,8 +1,11 @@
-package com.ads.wpserver.server;
+package com.ads.wpserver.netty;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.ads.wpserver.util.NettyServerConfig;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
@@ -22,12 +25,17 @@ import io.netty.handler.logging.LoggingHandler;
 
 @Component
 public class WpNettyServer {
-
+	
 	private static Logger logger = LoggerFactory.getLogger(WpNettyServer.class);
-    static final int PORT = 9090;
-    static final int POOL_SIZE = 20;
+	
+	@Autowired
+	private NettyServerConfig config;
+	@Autowired
+	private DataServerHandler dataServerHandler;
 
     public void starter() throws Exception {
+    	int PORT = config.getServer().getPort();
+    	int POOL_SIZE = config.getServer().getPoolSize();
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
@@ -42,10 +50,9 @@ public class WpNettyServer {
                  public void initChannel(SocketChannel ch) throws Exception {
                      ChannelPipeline p = ch.pipeline();
                      ByteBuf delimiter = Unpooled.copiedBuffer(",END".getBytes());
-//                     p.addLast(new IdleStateHandler(1,0,1));
                      p.addLast(new DelimiterBasedFrameDecoder(300, delimiter));
                      p.addLast(new StringDecoder());
-                     p.addLast(new DataServerHandler());
+                     p.addLast(dataServerHandler);
                  }
              });
             ChannelFuture f = b.bind(PORT).sync();

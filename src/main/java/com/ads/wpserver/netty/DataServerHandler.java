@@ -1,4 +1,4 @@
-package com.ads.wpserver.server;
+package com.ads.wpserver.netty;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -9,10 +9,26 @@ import java.io.UnsupportedEncodingException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+import com.ads.wpserver.mysql.model.WpData;
+import com.ads.wpserver.mysql.model.WpOrderBuffer;
+import com.ads.wpserver.mysql.service.WpDataService;
+import com.ads.wpserver.mysql.service.WpDataService2;
+import com.ads.wpserver.mysql.service.WpOrderBufferService;
+import com.ads.wpserver.util.ObjectUtil;
 
+@Component
 public class DataServerHandler extends ChannelInboundHandlerAdapter {
 	private static Logger logger = LoggerFactory.getLogger(DataServerHandler.class);
+
+	@Autowired
+	private WpDataService2 wpDataService2;
+	@Autowired
+	private WpDataService wpDataService;
+	@Autowired
+	private WpOrderBufferService wpOrderBufferService;
 
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
@@ -28,8 +44,6 @@ public class DataServerHandler extends ChannelInboundHandlerAdapter {
 
 	@Override
 	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-		// ByteBuf buf = (ByteBuf)msg;
-		// String str = this.getMessage(buf);
 		String str = ((String) msg).trim();
 		str += ",END";
 		if (str != null && !"".equals(str)) {
@@ -38,12 +52,30 @@ public class DataServerHandler extends ChannelInboundHandlerAdapter {
 			 * 以SEND开头为有效数据
 			 */
 			if (str.startsWith("SEND") && str.endsWith("END")) {
-				
+				String[] strs = str.split(",");
+				/**
+				 * 数据格式正确，解析入库
+				 */
+				if (strs.length == 18) {
+					WpData wp = ObjectUtil.stringToObject(strs);
+					wpDataService2.saveWpData(wp);
+					wpDataService.saveWpData(wp);
+				}
+				/**
+				 * 查询有没有待发送的指令
+				 */
+				WpOrderBuffer order = wpOrderBufferService.selectOrderBufferByName(strs[2]);
+				if(order!=null){
+					ByteBuf buf = Unpooled
+							.copiedBuffer(new String(order.getV_order_content().getBytes("gb2312"), "GB2312").getBytes());
+					ctx.write(buf);
+					wpOrderBufferService.updateOrderBufferFlag(strs[2]);
+					logger.error("设备编号为：" + order.getV_equipment_name() + "的第" + order.getI_id() + "号指令已发送成功！");
+				}
 			}
 		} else {
 			logger.info("没有数据...");
 		}
-		
 	}
 
 	@Override
