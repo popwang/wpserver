@@ -66,8 +66,9 @@ public class DataServerHandler extends ChannelInboundHandlerAdapter {
 				 */
 				WpOrderBuffer order = wpOrderBufferService.selectOrderBufferByName(strs[2]);
 				if(order!=null){
+					System.out.println();
 					ByteBuf buf = Unpooled
-							.copiedBuffer(new String(order.getV_order_content().getBytes("gb2312"), "GB2312").getBytes());
+							.copiedBuffer(new String(order.getV_order_content().getBytes("utf-8"), "GBK").getBytes());
 					ctx.write(buf);
 					wpOrderBufferService.updateOrderBufferFlag(strs[2]);
 					logger.error("设备编号为：" + order.getV_equipment_name() + "的第" + order.getI_id() + "号指令已发送成功！");

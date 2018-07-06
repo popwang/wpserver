@@ -64,6 +64,12 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+		          <mainClass>com.ads.wpserver.WpserverApplication</mainClass>
+		          <fork>true</fork>
+		          <skipTests>true</skipTests>
+		          <finalName>wpNettyServer</finalName>
+		        </configuration>
 			</plugin>
 		</plugins>
 	</build>
