@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: dev
+    active: prod
   datasource:
     driverClassName: com.mysql.jdbc.Driver
     username: root
